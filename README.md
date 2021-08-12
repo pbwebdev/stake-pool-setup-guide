@@ -96,52 +96,64 @@ Building the NODE
 STEP 1 - downloading the prerequisites:
 this step will create the folder structure and it will download the necessary files and scripts to operate the POOL
 
-mkdir "$HOME/tmp"
-cd "$HOME/tmp"
-curl -sS -o prereqs.sh https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/prereqs.sh
-chmod 755 prereqs.sh
-./prereqs.sh 
-. "${HOME}/.bashrc"
-*check if this command (. “${HOME}/.bashrc”) was configured *
+> mkdir "$HOME/tmp"
+> cd "$HOME/tmp"
+> curl -sS -o prereqs.sh https://raw.githubusercontent.com/cardano-community/guild-operators/master/scripts/cnode-helper-scripts/prereqs.sh
+> chmod 755 prereqs.sh
+> ./prereqs.sh 
+> . "${HOME}/.bashrc"
+> *check if this command (. “${HOME}/.bashrc”) was configured *
+
 STEP2 - building the node :
 this commands will actually build/compile the node and will take around 40-45 minutes.
 
-cd ~/git
-git clone https://github.com/input-output-hk/cardano-node
-cd cardano-node
+> cd ~/git
+> git clone https://github.com/input-output-hk/cardano-node
+> cd cardano-node
 
-git fetch --tags --all
-git checkout 1.25.1
-git pull origin master
+> git fetch --tags --all
+> git checkout 1.28.0
+> git pull origin master
 
-echo -e "package cardano-crypto-praos\n  flags: -external-libsodium-vrf" > cabal.project.local
-$CNODE_HOME/scripts/cabal-build-all.sh -o
-now you can take a break till the node will be compiled! Enjoy the :coffee:
+> echo -e "package cardano-crypto-praos\n  flags: -external-libsodium-vrf" > cabal.project.local
+> $CNODE_HOME/scripts/cabal-build-all.sh -o
+
+
+Wait a long time while the everything is being built
+
 
 check the cardano-cli and cardano-node version
-cardano-cli --version
-cardano-node --version
-If everything looks fine go to the next STEP
 
-!!! STEP 2 can be applied with success if you will want to upgrade/downgrade the nodes to a new version; You will only need to replace 1.25.1 with the desired version !!!
+> cardano-cli --version
+> cardano-node --version
+
+Continue if the versions are correct
+
+
+## STEP 2 can be applied with success if you will want to upgrade/downgrade the nodes to a new version; You will only need to replace 1.25.1 with the desired version ##
 ==============================================================================
 
-STEP 3 - start and sync the nodes
+## STEP 3 - start and sync the nodes ##
 Once the nodes were built you must start them in order to sync (the nodes will download all the blockchain db locally so it will take more hours)
 
 go to scripts folder :
-cd $CNODE_HOME/scripts
+
+> cd $CNODE_HOME/scripts
 or
-cd /opt/cardano/cnode/scripts 
+> cd /opt/cardano/cnode/scripts 
+
 open env file and change the CNODE_PORT (by default is 6000 but perhaps you will want to use another ports)
-nano env
-CNODE_PORT=6000 
+
+> nano env
+> CNODE_PORT=6000 
+
 save the file
-Ctrl+x  y  Enter 
+
 set up the node to start as systemd (this means that if your server will crash or it will reboot, the node/process will start automatically);
 !!! remember that all scripts are located inside the scripts folder
 
-./deploy-as-systemd.sh
+>  ./deploy-as-systemd.sh
+
 IMPORTANT to know when you run ./deploy-as-systemd.sh :
 It will ask also to set the topologyupdater process as systemd and you will:
 
@@ -151,23 +163,21 @@ for Relay press YES for topologyUpdater, let the default timer for cnode auto re
 
 restart the node and check the status:
 
-sudo systemctl restart cnode
-sudo systemctl status cnode
+> sudo systemctl restart cnode
+> sudo systemctl status cnode
+
 you should see:
 image
 
 once the node is up let it sync with the blockchain; you can check the status by running the script:
 
-./gLiveView.sh
-You should see the output:
-
-image
+> ./gLiveView.sh
 
 after all nodes are 100% synced, it’s time to connect to each other!
 
 ==============================================================================
 
-STEP 4 - connect the nodes to each other
+## STEP 4 - connect the nodes to each other
 Between Producer and Relay will be configured a static connection:
 
 for Producer :
